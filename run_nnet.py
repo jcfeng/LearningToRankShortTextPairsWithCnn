@@ -114,9 +114,12 @@ def main():
   dummy_word_id = numpy.max(a_overlap_train)
   # vocab_emb_overlap = numpy_rng.uniform(-0.25, 0.25, size=(dummy_word_id+1, ndim))
   print "Gaussian"
+  # 从标准正态分布中生成维度为（a,b）的随机数组
   vocab_emb_overlap = numpy_rng.randn(dummy_word_id+1, ndim) * 0.25
   # vocab_emb_overlap = numpy_rng.randn(dummy_word_id+1, ndim) * 0.05
   # vocab_emb_overlap = numpy_rng.uniform(-0.25, 0.25, size=(dummy_word_id+1, ndim))
+
+  # 返回矩阵的最后一行
   vocab_emb_overlap[-1] = 0
 
   # Load word2vec embeddings
@@ -165,16 +168,20 @@ def main():
   a_filter_widths = [5]
 
   ###### QUESTION ######
+  # 首先获得词向量信息
   lookup_table_words = nn_layers.LookupTableFastStatic(W=vocab_emb, pad=max(q_filter_widths)-1)
   lookup_table_overlap = nn_layers.LookupTableFast(W=vocab_emb_overlap, pad=max(q_filter_widths)-1)
 
   lookup_table = nn_layers.ParallelLookupTable(layers=[lookup_table_words, lookup_table_overlap])
 
+# 因为是文本数据所以是单通道
   num_input_channels = 1
   input_shape = (batch_size, num_input_channels, q_max_sent_size + 2*(max(q_filter_widths)-1), ndim)
 
   conv_layers = []
+  # 对各个filter构造卷积层
   for filter_width in q_filter_widths:
+      # 每一层卷积的构造
     filter_shape = (nkernels, num_input_channels, filter_width, ndim)
     conv = nn_layers.Conv2dLayer(rng=numpy_rng, filter_shape=filter_shape, input_shape=input_shape)
     non_linearity = nn_layers.NonLinearityLayer(b_size=filter_shape[0], activation=activation)
