@@ -1,3 +1,4 @@
+#-*-coding:utf-8-*-
 from datetime import datetime
 from sklearn import metrics
 from theano import tensor as T
@@ -40,6 +41,7 @@ def main():
 
   data_dir = mode
 
+# 加载数据集词向量
   if mode in ['TRAIN-ALL']:
     q_train = numpy.load(os.path.join(data_dir, 'train-all.questions.npy'))
     a_train = numpy.load(os.path.join(data_dir, 'train-all.answers.npy'))
@@ -98,7 +100,8 @@ def main():
   # nnet_fname = os.path.join(nnet_outdir, 'nnet.dat')
   # params_fname = os.path.join(nnet_outdir, 'best_dev_params.epoch=00;batch=14640;dev_f1=83.12;test_acc=85.00.dat')
   # train_nnet, test_nnet = nn_layers.load_nnet(nnet_fname, params_fname)
-
+  numpy.random.RandomState()
+  # 指定种子值（指定种子值是为了使同样的条件下每次产生的随机数一样，避免程序调试时由随机数不同而引起的问题）
   numpy_rng = numpy.random.RandomState(123)
   q_max_sent_size = q_train.shape[1]
   a_max_sent_size = a_train.shape[1]
@@ -107,6 +110,7 @@ def main():
 
   ndim = 5
   print "Generating random vocabulary for word overlap indicator features with dim:", ndim
+  # numpy.max在不指定维度信息时，返回数组中的最大的一个值
   dummy_word_id = numpy.max(a_overlap_train)
   # vocab_emb_overlap = numpy_rng.uniform(-0.25, 0.25, size=(dummy_word_id+1, ndim))
   print "Gaussian"

@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/deep-qa-master.iml" filepath="$PROJECT_DIR$/.idea/deep-qa-master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../some_function/.idea/some_function.iml" filepath="$PROJECT_DIR$/../some_function/.idea/some_function.iml" />
     </modules>
   </component>
 </project>
