@@ -119,7 +119,7 @@ def main():
   # vocab_emb_overlap = numpy_rng.randn(dummy_word_id+1, ndim) * 0.05
   # vocab_emb_overlap = numpy_rng.uniform(-0.25, 0.25, size=(dummy_word_id+1, ndim))
 
-  # 返回矩阵的最后一行
+  # [-1]引用的是矩阵的最后一行
   vocab_emb_overlap[-1] = 0
 
   # Load word2vec embeddings

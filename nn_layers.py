@@ -397,6 +397,7 @@ class ConvolutionLayer(Layer):
     if W is None:
       # there are "num input feature maps * filter height * filter width"
       # inputs to each hidden unit
+      # numpy.prod是指定维度上（默认为整个矩阵）上各个数字相乘
       fan_in = numpy.prod(filter_shape[1:])
       # each unit in the lower layer receives a gradient from:
       # "num output feature maps * filter height * filter width" /
@@ -404,6 +405,7 @@ class ConvolutionLayer(Layer):
       fan_out = filter_shape[0] * numpy.prod(filter_shape[2:])
       W_bound = numpy.sqrt(1. / fan_in)
       # W_bound = numpy.sqrt(6. / (fan_in + fan_out))
+      # 对参数权值矩阵的初始化
       W_data = numpy.asarray(rng.uniform(low=-W_bound, high=W_bound, size=filter_shape), dtype=theano.config.floatX)
 
       # Simple initialization
