@@ -52,6 +52,8 @@ def compute_overlap_features(questions, answers, word2df=None, stoplist=None):
   word2df = word2df if word2df else {}
   stoplist = stoplist if stoplist else set()
   feats_overlap = []
+  # zip函数为内置函数，把两个list，对应位置的项目组成tuple，此处并不是很懂非要使用这个函数的必要性
+  # zip(*XXXX)用于unzip一个list
   for question, answer in zip(questions, answers):
     # q_set = set(question)
     # a_set = set(answer)
@@ -63,6 +65,7 @@ def compute_overlap_features(questions, answers, word2df=None, stoplist=None):
 
     # q_set = set([q for q in question if q not in stoplist])
     # a_set = set([a for a in answer if a not in stoplist])
+    # 求两个集合的交集
     word_overlap = q_set.intersection(a_set)
     df_overlap = 0.0
     for w in word_overlap:

@@ -94,6 +94,8 @@ def main():
   print 'a_dev', a_dev.shape
   print 'a_test', a_test.shape
 
+  print 'a_overlap_train',a_overlap_train.shape
+
   ## Get the word embeddings from the nnet trained on SemEval
   # ndim = 40
   # nnet_outdir = 'exp/ndim=60;batch=100;max_norm=0;learning_rate=0.1;2014-12-02-15:53:14'
