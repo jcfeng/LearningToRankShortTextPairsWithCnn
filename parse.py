@@ -80,6 +80,7 @@ def compute_overlap_features(questions, answers, word2df=None, stoplist=None):
 
 
 def compute_overlap_idx(questions, answers, stoplist, q_max_sent_length, a_max_sent_length):
+  # 计算overlap下标矩阵，矩阵shape为len(question)*最长question长度，如果当前位置的单词，同时存在于question和answer中，则置为1，否则为0
   stoplist = stoplist if stoplist else []
   feats_overlap = []
   q_indices, a_indices = [], []
@@ -136,8 +137,10 @@ def add_to_vocab(data, alphabet):
 def convert2indices(data, alphabet, dummy_word_idx, max_sent_length=40):
   data_idx = []
   for sentence in data:
+    # 对于超出当前句子长度的部分，默认值为词典大小
     ex = np.ones(max_sent_length) * dummy_word_idx
     for i, token in enumerate(sentence):
+      # 对于不存在的值，设置为默认的未登录编号
       idx = alphabet.get(token, UNKNOWN_WORD_IDX)
       ex[i] = idx
     data_idx.append(ex)
@@ -178,6 +181,7 @@ if __name__ == '__main__':
     subprocess.call("/bin/cat {} > {}".format(files, all_fname), shell=True)
 
     # qids, questions, answers, labels = load_data(all_fname, stoplist)
+    # 此处得到的question和answer都为原句split成word的格式
     qids, questions, answers, labels = load_data(all_fname)
 
     ### Compute document frequencies.
@@ -193,6 +197,7 @@ if __name__ == '__main__':
     print word2dfs.items()[:10]
     #########
 
+    # 词典：单词与编号dict
     alphabet = Alphabet(start_feature_id=0)
     alphabet.add('UNKNOWN_WORD_IDX')
 
@@ -203,8 +208,10 @@ if __name__ == '__main__':
     cPickle.dump(alphabet, open(os.path.join(outdir, 'vocab.pickle'), 'w'))
     print "alphabet", len(alphabet)
 
+    # 词典不重复词的数目
     dummy_word_idx = alphabet.fid
-
+    # map函数的原型是map(function, iterable, …)，将function应用于iterable的每一个元素，结果以列表的形式返回
+    # 此处得到的是最长的questuon和answer的长度
     q_max_sent_length = max(map(lambda x: len(x), questions))
     a_max_sent_length = max(map(lambda x: len(x), answers))
     print 'q_max_sent_length', q_max_sent_length
@@ -215,9 +222,11 @@ if __name__ == '__main__':
       print fname
       # qids, questions, answers, labels = load_data(fname, stoplist)
       qids, questions, answers, labels = load_data(fname)
-
+      # 得到的是一个由overlap值组成的向量
       overlap_feats = compute_overlap_features(questions, answers, stoplist=None, word2df=word2dfs)
       overlap_feats_stoplist = compute_overlap_features(questions, answers, stoplist=stoplist, word2df=word2dfs)
+
+      # 将多个矩阵在第二个纬度方向合并,
       overlap_feats = np.hstack([overlap_feats, overlap_feats_stoplist])
       # overlap_feats = compute_overlap_features(questions, answers, None)
       # print overlap_feats[:10]
@@ -233,10 +242,11 @@ if __name__ == '__main__':
       print "pairs", len(labels)
 
       # stoplist = None
+      # 计算overlap下标矩阵，矩阵shape为len(question)*最长question长度，如果当前位置的单词，同时存在于question和answer中，则置为1，否则为0
       q_overlap_indices, a_overlap_indices = compute_overlap_idx(questions, answers, stoplist, q_max_sent_length, a_max_sent_length)
       # print q_overlap_indices[:3]
       # print a_overlap_indices[:3]
-
+      # 转化为大小为len(questions)*最长question的矩阵，每一位上如果对应有单词，就转化为单词在词典中的编号
       questions_idx = convert2indices(questions, alphabet, dummy_word_idx, q_max_sent_length)
       answers_idx = convert2indices(answers, alphabet, dummy_word_idx, a_max_sent_length)
       print 'answers_idx', answers_idx.shape
