@@ -1,3 +1,4 @@
+#-*-coding:utf-8-*-
 import re
 import os
 import numpy as np
@@ -260,3 +261,4 @@ if __name__ == '__main__':
 
       np.save(os.path.join(outdir, '{}.q_overlap_indices.npy'.format(basename)), q_overlap_indices)
       np.save(os.path.join(outdir, '{}.a_overlap_indices.npy'.format(basename)), a_overlap_indices)
+      print " numpy.max(a_overlap_indices):",np.max(a_overlap_indices)

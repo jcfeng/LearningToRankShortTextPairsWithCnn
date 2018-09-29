@@ -113,7 +113,9 @@ def main():
   ndim = 5
   print "Generating random vocabulary for word overlap indicator features with dim:", ndim
   # numpy.max在不指定维度信息时，返回数组中的最大的一个值
+  #QQQQQQ
   dummy_word_id = numpy.max(a_overlap_train)
+  print "dummy_word_id:",dummy_word_id
   # vocab_emb_overlap = numpy_rng.uniform(-0.25, 0.25, size=(dummy_word_id+1, ndim))
   print "Gaussian"
   # 从标准正态分布中生成维度为（a,b）的随机数组
