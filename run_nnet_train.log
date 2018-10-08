@@ -1,0 +1,88 @@
+Running training in the TRAIN setting
+y_train (array([0, 1], dtype=int32), array([4370,  348]))
+y_dev (array([0, 1], dtype=int32), array([926, 222]))
+y_test (array([0, 1], dtype=int32), array([1233,  284]))
+q_train (4718, 33)
+q_dev (1148, 33)
+q_test (1517, 33)
+a_train (4718, 40)
+a_dev (1148, 40)
+a_test (1517, 40)
+a_overlap_train (4718, 40)
+Generating random vocabulary for word overlap indicator features with dim: 5
+dummy_word_id: 2
+Gaussian
+Loading word embeddings from TRAIN/emb_aquaint+wiki.txt.gz.ndim=50.bin.npy
+Word embedding matrix size: (17023, 50)
+batch_size 50
+n_epochs 25
+learning_rate 0.1
+max_norm 0
+Training nnet [num params: 106236]
+	FeedForwardNet [num params: 27615]
+		ParallelLookupTable [num params: 15]
+			LookupTableFastStatic: [17023    50]
+			LookupTableFast: [3 5]
+		ParallelLayer [num params: 27600]
+			FeedForwardNet [num params: 27600]
+				Conv2dLayer: filter_shape=[100   1   5  55]; input_shape=(50, 1, 41, 55)
+				NonLinearityLayer: b_shape=[100] activation=Elemwise{tanh,no_inplace}
+				KMaxPoolLayer: k_max=1
+		FlattenLayer
+	FeedForwardNet [num params: 27615]
+		ParallelLookupTable [num params: 15]
+			LookupTableFastStatic: [17023    50]
+			LookupTableFast: [3 5]
+		ParallelLayer [num params: 27600]
+			FeedForwardNet [num params: 27600]
+				Conv2dLayer: filter_shape=[100   1   5  55]; input_shape=(50, 1, 48, 55)
+				NonLinearityLayer: b_shape=[100] activation=Elemwise{tanh,no_inplace}
+				KMaxPoolLayer: k_max=1
+		FlattenLayer
+	PairwiseNoFeatsLayer: W=[100 100]
+	LinearLayer: W_shape=[201 201] b_shape=[201] activation=Elemwise{tanh,no_inplace}
+	LogisticRegression: W=[201   2], b=[2]
+Saving to exp.out/ndim=55;batch=50;max_norm=0;learning_rate=0.1;2018-10-08-13.07.20/nnet.dat
+Total params number: 106236
+Generating adadelta updates
+labels [0, 1]
+Zero out dummy word: True
+epoch: 0 batch: 10 dev auc: 51.3241; test map: 51.5188; best_dev_acc: -inf
+epoch: 0 batch: 20 dev auc: 54.5770; test map: 52.8630; best_dev_acc: 51.3241
+epoch: 0 batch: 30 dev auc: 54.7623; test map: 54.4359; best_dev_acc: 54.5770
+epoch: 0 batch: 40 dev auc: 57.3901; test map: 56.9395; best_dev_acc: 54.7623
+epoch: 0 batch: 50 dev auc: 59.8632; test map: 59.2742; best_dev_acc: 57.3901
+epoch: 0 batch: 60 dev auc: 63.6867; test map: 60.6860; best_dev_acc: 59.8632
+epoch: 0 batch: 70 dev auc: 65.5877; test map: 61.5946; best_dev_acc: 63.6867
+epoch: 0 batch: 80 dev auc: 67.9164; test map: 64.2870; best_dev_acc: 65.5877
+epoch: 0 batch: 90 dev auc: 70.2367; test map: 66.7936; best_dev_acc: 67.9164
+epoch: 0 batch: 95 dev auc: 70.4532; test map: 66.2115; best_dev_acc: 70.2367
+epoch 0 took 59.0044 seconds
+epoch: 1 batch: 10 dev auc: 70.6784; test map: 66.6694; best_dev_acc: 70.4532
+epoch: 1 batch: 20 dev auc: 73.1213; test map: 69.3785; best_dev_acc: 70.6784
+epoch: 1 batch: 30 dev auc: 74.7704; test map: 70.4581; best_dev_acc: 73.1213
+epoch: 1 batch: 40 dev auc: 74.7850; test map: 69.8044; best_dev_acc: 74.7704
+epoch: 1 batch: 50 dev auc: 75.4198; test map: 70.8307; best_dev_acc: 74.7850
+epoch: 1 batch: 60 dev auc: 75.9953; test map: 70.9322; best_dev_acc: 75.4198
+epoch: 1 batch: 70 dev auc: 76.2473; test map: 70.2639; best_dev_acc: 75.9953
+epoch: 1 batch: 90 dev auc: 76.2764; test map: 71.5670; best_dev_acc: 76.2473
+epoch: 1 batch: 95 dev auc: 76.3475; test map: 71.5628; best_dev_acc: 76.2764
+epoch 1 took 60.7189 seconds
+epoch: 2 batch: 20 dev auc: 76.5814; test map: 70.8654; best_dev_acc: 76.3475
+epoch: 2 batch: 30 dev auc: 76.8777; test map: 70.7632; best_dev_acc: 76.5814
+epoch: 2 batch: 50 dev auc: 77.2634; test map: 70.7037; best_dev_acc: 76.8777
+epoch: 2 batch: 70 dev auc: 78.0097; test map: 70.1412; best_dev_acc: 77.2634
+epoch 2 took 58.0200 seconds
+epoch: 3 batch: 10 dev auc: 79.4014; test map: 70.8701; best_dev_acc: 78.0097
+epoch 3 took 51.6013 seconds
+epoch 4 took 47.2983 seconds
+epoch 5 took 45.4597 seconds
+epoch: 6 batch: 40 dev auc: 79.4889; test map: 73.2461; best_dev_acc: 79.4014
+epoch 6 took 49.4439 seconds
+epoch 7 took 42.5530 seconds
+epoch 8 took 39.6669 seconds
+Quitting after of no update of the best score on dev set 3
+Training took: 4map            	all	0.7325
+recip_rank     	all	0.8018
+93.6271 seconds
+Running trec_eval script...
