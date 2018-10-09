@@ -105,7 +105,9 @@ def main():
   numpy.random.RandomState()
   # 指定种子值（指定种子值是为了使同样的条件下每次产生的随机数一样，避免程序调试时由随机数不同而引起的问题）
   numpy_rng = numpy.random.RandomState(123)
+  # question中最长的长度
   q_max_sent_size = q_train.shape[1]
+  # answer中最长的长度
   a_max_sent_size = a_train.shape[1]
   # print 'max', numpy.max(a_train)
   # print 'min', numpy.min(a_train)
@@ -119,6 +121,8 @@ def main():
   # vocab_emb_overlap = numpy_rng.uniform(-0.25, 0.25, size=(dummy_word_id+1, ndim))
   print "Gaussian"
   # 从标准正态分布中生成维度为（a,b）的随机数组
+  # 这一行看起来像是对未登录词的初始化
+  # QQQQQ
   vocab_emb_overlap = numpy_rng.randn(dummy_word_id+1, ndim) * 0.25
   # vocab_emb_overlap = numpy_rng.randn(dummy_word_id+1, ndim) * 0.05
   # vocab_emb_overlap = numpy_rng.uniform(-0.25, 0.25, size=(dummy_word_id+1, ndim))
@@ -180,13 +184,17 @@ def main():
 
 # 因为是文本数据所以是单通道
   num_input_channels = 1
+  # QQQQQq_max_sent_size + 2 * (max(q_filter_widths) - 1) 这一项的含义。。。
+  # QQQQ以及最后一项为什么是ndim
   input_shape = (batch_size, num_input_channels, q_max_sent_size + 2*(max(q_filter_widths)-1), ndim)
 
   conv_layers = []
   # 对各个filter构造卷积层
   for filter_width in q_filter_widths:
       # 每一层卷积的构造
+      #QQQQQQ此处这个 ndim是干嘛的啊：out_channel的宽度不太对吧。。。。感觉像是卷积核的第二维宽度
     filter_shape = (nkernels, num_input_channels, filter_width, ndim)
+      # 此处采用的是2D卷积
     conv = nn_layers.Conv2dLayer(rng=numpy_rng, filter_shape=filter_shape, input_shape=input_shape)
     non_linearity = nn_layers.NonLinearityLayer(b_size=filter_shape[0], activation=activation)
     pooling = nn_layers.KMaxPoolLayer(k_max=q_k_max)

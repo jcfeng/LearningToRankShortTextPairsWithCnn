@@ -77,8 +77,10 @@ class FeedForwardNet(Layer):
 
     self.layers = layers if layers else []
     for layer in layers:
+    # 注意此处的extend与append的差别
       self.weights.extend(layer.weights)
       self.biases.extend(layer.biases)
+    # 注意此处weight和biase的顶层类型为list,list的+运算和numpy矩阵的+运算差别很大，前者是将相加的两方拼接，后者是数值相加
       self.params.extend(layer.weights + layer.biases)
     self.num_params = sum([numpy.prod(p.shape.eval()) for p in self.params])
 
@@ -180,7 +182,7 @@ class PadLayer(Layer):
     return out
 
 
-
+# QQQQQQ该类与LookupTableFast一毛一样，存在两个的意义是啥
 class LookupTableFastStatic(Layer):
     """ Basic linear transformation layer (W.X + b).
     Padding is used to force conv2d with valid mode behave as working in full mode."""
