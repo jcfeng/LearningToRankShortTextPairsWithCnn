@@ -186,13 +186,15 @@ def main():
   num_input_channels = 1
   # QQQQQq_max_sent_size + 2 * (max(q_filter_widths) - 1) 这一项的含义。。。
   # QQQQ以及最后一项为什么是ndim
+  # Minibatch of feature map stacks, of shape(batch  size, stack size, nb row, nb  col) see the optional parameter image_shape
   input_shape = (batch_size, num_input_channels, q_max_sent_size + 2*(max(q_filter_widths)-1), ndim)
+  print "convlution layer input shape:",input_shape
 
   conv_layers = []
   # 对各个filter构造卷积层
   for filter_width in q_filter_widths:
       # 每一层卷积的构造
-      #QQQQQQ此处这个 ndim是干嘛的啊：out_channel的宽度不太对吧。。。。感觉像是卷积核的第二维宽度
+      #Set of filters used in CNN layer of shape (nb filters, stack size, nb row, nb col)
     filter_shape = (nkernels, num_input_channels, filter_width, ndim)
       # 此处采用的是2D卷积
     conv = nn_layers.Conv2dLayer(rng=numpy_rng, filter_shape=filter_shape, input_shape=input_shape)
