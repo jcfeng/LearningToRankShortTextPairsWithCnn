@@ -167,6 +167,7 @@ def main():
   activation = T.tanh
 
   dropout_rate = 0.5
+  # feature map数目
   nkernels = 100
   q_k_max = 1
   a_k_max = 1
@@ -233,6 +234,7 @@ def main():
     conv_layers.append(conv2dNonLinearMaxPool)
 
   join_layer = nn_layers.ParallelLayer(layers=conv_layers)
+  # QQQQ为啥这里有个flattenlayer
   flatten_layer = nn_layers.FlattenLayer()
 
   nnet_a = nn_layers.FeedForwardNet(layers=[
@@ -244,6 +246,7 @@ def main():
   #######
   # print 'nnet_q.output', nnet_q.output.ndim
 
+# QQQQQ这里又是干嘛的
   q_logistic_n_in = nkernels * len(q_filter_widths) * q_k_max
   a_logistic_n_in = nkernels * len(a_filter_widths) * a_k_max
 

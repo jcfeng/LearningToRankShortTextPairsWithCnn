@@ -307,6 +307,7 @@ class NonLinearityLayer(Layer):
     super(NonLinearityLayer, self).__init__()
     if not b:
       b_values = numpy.zeros(b_size, dtype=theano.config.floatX)
+      # 参数borrow：borrow = True / False:对数据的任何改变会 / 不会影响到原始的变量
       b = theano.shared(value=b_values, name='b', borrow=True)
     self.b = b
     self.activation = activation
@@ -314,6 +315,7 @@ class NonLinearityLayer(Layer):
     self.biases = [self.b]
 
   def output_func(self, input):
+      # dimshuffle函数在b为share类型时才可，是进行维度变换
     return self.activation(input + self.b.dimshuffle('x', 0, 'x', 'x'))
 
   def __repr__(self):
