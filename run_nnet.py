@@ -329,6 +329,7 @@ def main():
     os.makedirs(nnet_outdir)
   nnet_fname = os.path.join(nnet_outdir, 'nnet.dat')
   print "Saving to", nnet_fname
+  # 将python对象序列化保存到本地的文件。
   cPickle.dump([train_nnet, test_nnet], open(nnet_fname, 'wb'), protocol=cPickle.HIGHEST_PROTOCOL)
 
   total_params = sum([numpy.prod(param.shape.eval()) for param in params])
@@ -372,6 +373,7 @@ def main():
   batch_x_a_overlap = T.lmatrix('batch_x_a_overlap')
   batch_y = T.ivector('batch_y')
 
+# 训练优化方案
   # updates = sgd_trainer.get_adagrad_updates(cost, params, learning_rate=learning_rate, max_norm=max_norm, _eps=1e-6)
   updates = sgd_trainer.get_adadelta_updates(cost, params, rho=0.95, eps=1e-6, max_norm=max_norm, word_vec_name='W_emb')
 
@@ -404,20 +406,22 @@ def main():
                  # x: batch_x,
                  y: batch_y}
 
+# 训练函数定义
   train_fn = theano.function(inputs=inputs_train,
                              outputs=cost,
                              updates=updates,
                              givens=givens_train)
-
+# 选择答案
   pred_fn = theano.function(inputs=inputs_pred,
                             outputs=predictions,
                             givens=givens_pred)
-
+# 每个选项的概率
   pred_prob_fn = theano.function(inputs=inputs_pred,
                             outputs=predictions_prob,
                             givens=givens_pred)
 
   def predict_batch(batch_iterator):
+    # numpy.hstack:Stack arrays in sequence horizontally (column wise).This is equivalent to concatenation along the second axis, except for 1-D arrays where it concatenates along the first axis
     preds = numpy.hstack([pred_fn(batch_x_q, batch_x_a, batch_x_q_overlap, batch_x_a_overlap) for batch_x_q, batch_x_a, batch_x_q_overlap, batch_x_a_overlap, _ in batch_iterator])
     return preds[:batch_iterator.n_samples]
 
@@ -425,6 +429,7 @@ def main():
     preds = numpy.hstack([pred_prob_fn(batch_x_q, batch_x_a, batch_x_q_overlap, batch_x_a_overlap) for batch_x_q, batch_x_a, batch_x_q_overlap, batch_x_a_overlap, _ in batch_iterator])
     return preds[:batch_iterator.n_samples]
 
+# 三个迭代器
   train_set_iterator = sgd_trainer.MiniBatchIteratorConstantBatchSize(numpy_rng, [q_train, a_train, q_overlap_train, a_overlap_train, y_train], batch_size=batch_size, randomize=True)
   dev_set_iterator = sgd_trainer.MiniBatchIteratorConstantBatchSize(numpy_rng, [q_dev, a_dev, q_overlap_dev, a_overlap_dev, y_dev], batch_size=batch_size, randomize=False)
   test_set_iterator = sgd_trainer.MiniBatchIteratorConstantBatchSize(numpy_rng, [q_test, a_test, q_overlap_test, a_overlap_test, y_test], batch_size=batch_size, randomize=False)
