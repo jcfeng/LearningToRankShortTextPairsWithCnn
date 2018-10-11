@@ -178,7 +178,9 @@ def main():
 
   ###### QUESTION ######
   # 首先获得词向量信息
+  # QQQQ为什么要有这两层？似乎已经获得了词的词向量表示：可能是用于为是每个具体的句子获得词向量表示
   lookup_table_words = nn_layers.LookupTableFastStatic(W=vocab_emb, pad=max(q_filter_widths)-1)
+  #QQQQQ这一层的用途？可能也是来获得具体的句子对的overlap向量
   lookup_table_overlap = nn_layers.LookupTableFast(W=vocab_emb_overlap, pad=max(q_filter_widths)-1)
 
   lookup_table = nn_layers.ParallelLookupTable(layers=[lookup_table_words, lookup_table_overlap])
@@ -193,6 +195,7 @@ def main():
 
   conv_layers = []
   # 对各个filter构造卷积层
+  # QQQQ各层的w矩阵初始化方案有所不同？初始化可能有哪些方案以及各种方案的性能
   for filter_width in q_filter_widths:
       # 每一层卷积的构造
       #Set of filters used in CNN layer of shape (nb filters, stack size, nb row, nb col)
@@ -287,6 +290,7 @@ def main():
   #                                       name="Test nnet")
   #########
 
+# 此处应该是进行句子匹配层
   # pairwise_layer = nn_layers.PairwiseMultiOnlySimWithFeatsLayer(q_in=q_logistic_n_in,
 
   pairwise_layer = nn_layers.PairwiseNoFeatsLayer(q_in=q_logistic_n_in,

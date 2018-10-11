@@ -277,6 +277,7 @@ class LinearLayer(Layer):
     super(LinearLayer, self).__init__()
 
     if W is None:
+        # 注意这个权重初始化方案
       W_values = numpy.asarray(rng.uniform(
                 low=-numpy.sqrt(6. / (n_in + n_out)),
                 high=numpy.sqrt(6. / (n_in + n_out)),
@@ -812,6 +813,7 @@ class PairwiseNoFeatsLayer(Layer):
   def __init__(self, q_in, a_in, activation=T.tanh):
     super(PairwiseNoFeatsLayer, self).__init__()
 
+# W是相似度匹配参数矩阵
     W = build_shared_zeros((q_in, a_in), 'W_softmax_pairwise')
 
     self.W = W
@@ -823,6 +825,7 @@ class PairwiseNoFeatsLayer(Layer):
   def output_func(self, input):
       # P(Y|X) = softmax(W.X + b)
       q, a = input[0], input[1]
+      # batched_dot用于多维向量相乘
       # dot = T.batched_dot(q, T.batched_dot(a, self.W))
       dot = T.batched_dot(q, T.dot(a, self.W.T))
       out = T.concatenate([dot.dimshuffle(0, 'x'), q, a], axis=1)
