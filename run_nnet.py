@@ -179,6 +179,7 @@ def main():
   ###### QUESTION ######
   # 首先获得词向量信息
   # QQQQ为什么要有这两层？似乎已经获得了词的词向量表示：可能是用于为是每个具体的句子获得词向量表示
+  # QQQQQ pad具体实现
   lookup_table_words = nn_layers.LookupTableFastStatic(W=vocab_emb, pad=max(q_filter_widths)-1)
   #QQQQQ这一层的用途？可能也是来获得具体的句子对的overlap向量
   lookup_table_overlap = nn_layers.LookupTableFast(W=vocab_emb_overlap, pad=max(q_filter_widths)-1)
@@ -187,7 +188,7 @@ def main():
 
 # 因为是文本数据所以是单通道
   num_input_channels = 1
-  # QQQQQq_max_sent_size + 2 * (max(q_filter_widths) - 1) 这一项的含义。。。
+  # QQQQQq_max_sent_size + 2 * (max(q_filter_widths) - 1) 这一项的含义:因为在lookup中都加了两倍的对应长度的pad
   # QQQQ以及最后一项为什么是ndim
   # Minibatch of feature map stacks, of shape(batch  size, stack size, nb row, nb  col) see the optional parameter image_shape
   input_shape = (batch_size, num_input_channels, q_max_sent_size + 2*(max(q_filter_widths)-1), ndim)
@@ -293,8 +294,8 @@ def main():
 # 此处应该是进行句子匹配层
   # pairwise_layer = nn_layers.PairwiseMultiOnlySimWithFeatsLayer(q_in=q_logistic_n_in,
 
-  pairwise_layer = nn_layers.PairwiseNoFeatsLayer(q_in=q_logistic_n_in,
-  # pairwise_layer = nn_layers.PairwiseWithFeatsLayer(q_in=q_logistic_n_in,
+  # pairwise_layer = nn_layers.PairwiseNoFeatsLayer(q_in=q_logistic_n_in,
+  pairwise_layer = nn_layers.PairwiseWithFeatsLayer(q_in=q_logistic_n_in,
   # pairwise_layer = nn_layers.PairwiseOnlySimWithFeatsLayer(q_in=q_logistic_n_in,
                                                 a_in=a_logistic_n_in)
   pairwise_layer.set_input((nnet_q.output, nnet_a.output))

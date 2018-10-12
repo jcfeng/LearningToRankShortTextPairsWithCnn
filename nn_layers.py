@@ -1,3 +1,4 @@
+#-*-coding:utf-8-*-
 import cPickle
 import numpy
 import theano
@@ -192,6 +193,7 @@ class LookupTableFastStatic(Layer):
       self.W = theano.shared(value=W, name='W_emb', borrow=True)
 
     def output_func(self, input):
+      print "LookupTableFastStatic.output_func",input
       out = self.W[input.flatten()].reshape((input.shape[0], 1, input.shape[1], self.W.shape[1]))
       if self.pad:
         pad_matrix = T.zeros((out.shape[0], out.shape[1], self.pad, out.shape[3]))
