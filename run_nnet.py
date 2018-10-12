@@ -161,6 +161,7 @@ def main():
 
   ## 1st conv layer.
   ndim = vocab_emb.shape[1] + vocab_emb_overlap.shape[1]
+  print "1st conv layer dim:",ndim
 
   ### Nonlinearity type
   # activation = nn_layers.relu_f

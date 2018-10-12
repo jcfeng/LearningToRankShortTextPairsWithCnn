@@ -158,6 +158,7 @@ class LookupTableFast(Layer):
       super(LookupTableFast, self).__init__()
       self.pad = pad
       self.W = theano.shared(value=W, name='W_emb', borrow=True)
+      # 有了这一行，w就会作为参数在网络中不断更新
       self.weights = [self.W]
 
     def output_func(self, input):
@@ -183,7 +184,7 @@ class PadLayer(Layer):
     return out
 
 
-# QQQQQQ该类与LookupTableFast一毛一样，存在两个的意义是啥
+# 该类与LookupTableFast做对比，W并未作为参数weight，因此并不更新，保持static
 class LookupTableFastStatic(Layer):
     """ Basic linear transformation layer (W.X + b).
     Padding is used to force conv2d with valid mode behave as working in full mode."""
@@ -193,7 +194,7 @@ class LookupTableFastStatic(Layer):
       self.W = theano.shared(value=W, name='W_emb', borrow=True)
 
     def output_func(self, input):
-      print "LookupTableFastStatic.output_func",input
+      print "LookupTableFastStatic.output_func",input.shape()
       out = self.W[input.flatten()].reshape((input.shape[0], 1, input.shape[1], self.W.shape[1]))
       if self.pad:
         pad_matrix = T.zeros((out.shape[0], out.shape[1], self.pad, out.shape[3]))
