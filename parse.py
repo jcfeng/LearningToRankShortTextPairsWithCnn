@@ -46,7 +46,8 @@ def load_data(fname):
     prev = line
   # print sorted(qid2num_answers.items(), key=lambda x: float(x[0]))
   print 'num_skipped', num_skipped
-  return qids, questions, answers, labels
+  return qids[0:50], questions[0:50], answers[0:50], labels[0:50]
+  # return qids, questions, answers, labels
 
 
 def compute_overlap_features(questions, answers, word2df=None, stoplist=None):

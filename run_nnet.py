@@ -337,16 +337,22 @@ def main():
   total_params = sum([numpy.prod(param.shape.eval()) for param in params])
   print 'Total params number:', total_params
 
+# 损失函数交叉熵
   cost = train_nnet.layers[-1].training_cost(y)
-  # y_train_counts = numpy.unique(y_train, return_counts=True)[1].astype(numpy.float32)
-  # weights_data = numpy.sum(y_train_counts) / y_train_counts
-  # weights_data_norm = numpy.linalg.norm(weights_data)
-  # weights_data /= weights_data_norm
-  # print 'weights_data', weights_data
-  # weights = theano.shared(weights_data, borrow=True)
-  # cost = train_nnet.layers[-1].training_cost_weighted(y, weights=weights)
+  ########################################
+  # 看起来像cost的另外一种求法
+  y_train_counts = numpy.unique(y_train, return_counts=True)[1].astype(numpy.float32)
+  weights_data = numpy.sum(y_train_counts) / y_train_counts
+  weights_data_norm = numpy.linalg.norm(weights_data)
+  weights_data /= weights_data_norm
+  print 'weights_data', weights_data
+  weights = theano.shared(weights_data, borrow=True)
+  cost = train_nnet.layers[-1].training_cost_weighted(y, weights=weights)
+  ########################################################
 
+# 经过softmax后的最大值对应的类别
   predictions = test_nnet.layers[-1].y_pred
+  # 经过softmax后的最大值
   predictions_prob = test_nnet.layers[-1].p_y_given_x[:,-1]
 
   ### L2 regularization

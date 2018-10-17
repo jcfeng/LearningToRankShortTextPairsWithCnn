@@ -490,6 +490,7 @@ class LogisticRegression(Layer):
 
     def training_cost_weighted(self, y, weights=None):
         """ Wrapper for standard name """
+        print "LogisticRegression.training_cost_weighted: p_y_given_x shape",self.p_y_given_x.shape
         LL = T.log(self.p_y_given_x)[T.arange(y.shape[0]), y]
         weights = T.repeat(weights.dimshuffle('x', 0), y.shape[0], axis=0)
         factors = weights[T.arange(y.shape[0]), y]
