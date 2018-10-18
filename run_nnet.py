@@ -301,6 +301,7 @@ def main():
                                                 a_in=a_logistic_n_in)
   pairwise_layer.set_input((nnet_q.output, nnet_a.output))
 
+# 此处n_in的取值要根据上一层匹配层的方案进行不同的计算
   # n_in = q_logistic_n_in + a_logistic_n_in + feats_ndim + a_logistic_n_in
   # n_in = q_logistic_n_in + a_logistic_n_in + feats_ndim + 50
   # n_in = q_logistic_n_in + a_logistic_n_in + feats_ndim + 1
@@ -340,14 +341,14 @@ def main():
 # 损失函数交叉熵
   cost = train_nnet.layers[-1].training_cost(y)
   ########################################
-  # 看起来像cost的另外一种求法
-  y_train_counts = numpy.unique(y_train, return_counts=True)[1].astype(numpy.float32)
-  weights_data = numpy.sum(y_train_counts) / y_train_counts
-  weights_data_norm = numpy.linalg.norm(weights_data)
-  weights_data /= weights_data_norm
-  print 'weights_data', weights_data
-  weights = theano.shared(weights_data, borrow=True)
-  cost = train_nnet.layers[-1].training_cost_weighted(y, weights=weights)
+  # # QQQQQ这种方式好奇怪？？？看起来像cost的另外一种求法
+  # y_train_counts = numpy.unique(y_train, return_counts=True)[1].astype(numpy.float32)
+  # weights_data = numpy.sum(y_train_counts) / y_train_counts
+  # weights_data_norm = numpy.linalg.norm(weights_data)
+  # weights_data /= weights_data_norm
+  # print 'weights_data', weights_data
+  # weights = theano.shared(weights_data, borrow=True)
+  # cost = train_nnet.layers[-1].training_cost_weighted(y, weights=weights)
   ########################################################
 
 # 经过softmax后的最大值对应的类别
@@ -355,7 +356,7 @@ def main():
   # 经过softmax后的最大值
   predictions_prob = test_nnet.layers[-1].p_y_given_x[:,-1]
 
-  ### L2 regularization
+  # ### L2 regularization
   # L2_word_emb = 1e-4
   # L2_conv1d = 3e-5
   # # L2_softmax = 1e-3

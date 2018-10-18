@@ -491,7 +491,7 @@ class LogisticRegression(Layer):
     def training_cost_weighted(self, y, weights=None):
         """ Wrapper for standard name """
         # T.arange功能与numpy.arange功能类似
-        print "self.p_y_given_x.evasl().shape:",self.p_y_given_x.evasl().shape
+        print "self.p_y_given_x.evasl().shape:",self.p_y_given_x.eval().shape
         LL = T.log(self.p_y_given_x)[T.arange(y.shape[0]), y]
         weights = T.repeat(weights.dimshuffle('x', 0), y.shape[0], axis=0)
         factors = weights[T.arange(y.shape[0]), y]
@@ -822,6 +822,7 @@ class PairwiseNoFeatsLayer(Layer):
     W = build_shared_zeros((q_in, a_in), 'W_softmax_pairwise')
 
     self.W = W
+    # 有下边这句说明这个变量是随着网络进行训练的
     self.weights = [self.W]
 
   def __repr__(self):
