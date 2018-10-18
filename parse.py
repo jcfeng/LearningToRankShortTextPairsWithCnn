@@ -46,8 +46,8 @@ def load_data(fname):
     prev = line
   # print sorted(qid2num_answers.items(), key=lambda x: float(x[0]))
   print 'num_skipped', num_skipped
-  return qids[0:50], questions[0:50], answers[0:50], labels[0:50]
-  # return qids, questions, answers, labels
+  # return qids[0:50], questions[0:50], answers[0:50], labels[0:50]
+  return qids, questions, answers, labels
 
 
 def compute_overlap_features(questions, answers, word2df=None, stoplist=None):
@@ -106,7 +106,9 @@ def compute_overlap_idx(questions, answers, stoplist, q_max_sent_length, a_max_s
     #   if q in word_overlap:
 
     a_idx = np.ones(a_max_sent_length) * 2
+    # enumerate()函数用于将一个可遍历的数据对象(如列表、元组或字符串)组合为一个索引序列，同时列出数据和数据下标，一般用在for 循环当中。
     for i, a in enumerate(answer):
+      print len(answer)
       value = 0
       if a in word_overlap:
         value = 1
@@ -221,7 +223,7 @@ if __name__ == '__main__':
 
     # Convert dev and test sets
     for fname in [train, dev, test]:
-      print fname
+      print "fname:"+fname
       # qids, questions, answers, labels = load_data(fname, stoplist)
       qids, questions, answers, labels = load_data(fname)
       # 得到的是一个由overlap值组成的向量

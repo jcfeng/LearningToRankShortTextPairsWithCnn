@@ -194,7 +194,7 @@ class LookupTableFastStatic(Layer):
       self.W = theano.shared(value=W, name='W_emb', borrow=True)
 
     def output_func(self, input):
-      print "LookupTableFastStatic.output_func",input.shape()
+
       out = self.W[input.flatten()].reshape((input.shape[0], 1, input.shape[1], self.W.shape[1]))
       if self.pad:
         pad_matrix = T.zeros((out.shape[0], out.shape[1], self.pad, out.shape[3]))
@@ -490,7 +490,8 @@ class LogisticRegression(Layer):
 
     def training_cost_weighted(self, y, weights=None):
         """ Wrapper for standard name """
-        print "LogisticRegression.training_cost_weighted: p_y_given_x shape",self.p_y_given_x.shape
+        # T.arange功能与numpy.arange功能类似
+        print "self.p_y_given_x.evasl().shape:",self.p_y_given_x.evasl().shape
         LL = T.log(self.p_y_given_x)[T.arange(y.shape[0]), y]
         weights = T.repeat(weights.dimshuffle('x', 0), y.shape[0], axis=0)
         factors = weights[T.arange(y.shape[0]), y]
@@ -837,7 +838,8 @@ class PairwiseNoFeatsLayer(Layer):
 
 
 class PairwiseOnlySimWithFeatsLayer(Layer):
-  def __init__(self, q_in, a_in, n_in, activation=T.tanh):
+  # def __init__(self, q_in, a_in, n_in, activation=T.tanh):
+  def __init__(self, q_in, a_in,  activation=T.tanh):
     super(PairwiseOnlySimWithFeatsLayer, self).__init__()
 
     W = build_shared_zeros((q_in, a_in), 'W_softmax_pairwise')

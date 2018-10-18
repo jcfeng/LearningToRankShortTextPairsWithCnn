@@ -295,8 +295,8 @@ def main():
 # 此处应该是进行句子匹配层
   # pairwise_layer = nn_layers.PairwiseMultiOnlySimWithFeatsLayer(q_in=q_logistic_n_in,
 
-  # pairwise_layer = nn_layers.PairwiseNoFeatsLayer(q_in=q_logistic_n_in,
-  pairwise_layer = nn_layers.PairwiseWithFeatsLayer(q_in=q_logistic_n_in,
+  pairwise_layer = nn_layers.PairwiseNoFeatsLayer(q_in=q_logistic_n_in,
+  # pairwise_layer = nn_layers.PairwiseWithFeatsLayer(q_in=q_logistic_n_in,
   # pairwise_layer = nn_layers.PairwiseOnlySimWithFeatsLayer(q_in=q_logistic_n_in,
                                                 a_in=a_logistic_n_in)
   pairwise_layer.set_input((nnet_q.output, nnet_a.output))
