@@ -69,11 +69,11 @@ def main():
   y_test = numpy.load(os.path.join(data_dir, 'test.labels.npy'))
   qids_test = numpy.load(os.path.join(data_dir, 'test.qids.npy'))
 
-  # x_train = numpy.load(os.path.join(data_dir, 'train.overlap_feats.npy'))
-  # x_dev = numpy.load(os.path.join(data_dir, 'dev.overlap_feats.npy'))
-  # x_test = numpy.load(os.path.join(data_dir, 'test.overlap_feats.npy'))
+  x_train = numpy.load(os.path.join(data_dir, 'train.overlap_feats.npy'))
+  x_dev = numpy.load(os.path.join(data_dir, 'dev.overlap_feats.npy'))
+  x_test = numpy.load(os.path.join(data_dir, 'test.overlap_feats.npy'))
 
-  # feats_ndim = x_train.shape[1]
+  feats_ndim = x_train.shape[1]
 
   # from sklearn.preprocessing import StandardScaler
   # scaler = StandardScaler()
@@ -95,6 +95,10 @@ def main():
   print 'a_test', a_test.shape
 
   print 'a_overlap_train',a_overlap_train.shape
+
+  print 'x_train',x_train.shape
+  print 'x_dev',x_dev.shape
+  print 'x_test',x_test.shape
 
   ## Get the word embeddings from the nnet trained on SemEval
   # ndim = 40
@@ -255,71 +259,71 @@ def main():
   q_logistic_n_in = nkernels * len(q_filter_widths) * q_k_max
   a_logistic_n_in = nkernels * len(a_filter_widths) * a_k_max
 
-  # dropout_q = nn_layers.FastDropoutLayer(rng=numpy_rng)
-  # dropout_a = nn_layers.FastDropoutLayer(rng=numpy_rng)
-  # dropout_q.set_input(nnet_q.output)
-  # dropout_a.set_input(nnet_a.output)
+  dropout_q = nn_layers.FastDropoutLayer(rng=numpy_rng)
+  dropout_a = nn_layers.FastDropoutLayer(rng=numpy_rng)
+  dropout_q.set_input(nnet_q.output)
+  dropout_a.set_input(nnet_a.output)
 
-  # feats_nout = 10
-  # x_hidden_layer = nn_layers.LinearLayer(numpy_rng, n_in=feats_ndim, n_out=feats_nout, activation=activation)
-  # x_hidden_layer.set_input(x)
+  feats_nout = 10
+  x_hidden_layer = nn_layers.LinearLayer(numpy_rng, n_in=feats_ndim, n_out=feats_nout, activation=activation)
+  x_hidden_layer.set_input(x)
 
   # feats_nout = feats_ndim
 
   ### Dropout
-  # classifier = nn_layers.PairwiseLogisticWithFeatsRegression(q_in=logistic_n_in,
-  #                                                   a_in=logistic_n_in,
-  #                                                   n_in=feats_nout,
-  #                                                   n_out=n_outs)
-  # # classifier.set_input((dropout_q.output, dropout_a.output, x_hidden_layer.output))
+  classifier = nn_layers.PairwiseLogisticWithFeatsRegression(q_in=q_logistic_n_in,
+                                                    a_in=a_logistic_n_in,
+                                                    n_in=feats_nout,
+                                                    n_out=n_outs)
+  classifier.set_input((dropout_q.output, dropout_a.output, x_hidden_layer.output))
   # classifier.set_input((dropout_q.output, dropout_a.output, x))
 
-  # # train_nnet = nn_layers.FeedForwardNet(layers=[nnet_q, nnet_a, x_hidden_layer, dropout_q, dropout_a, classifier],
-  # train_nnet = nn_layers.FeedForwardNet(layers=[nnet_q, nnet_a, dropout_q, dropout_a, classifier],
-  #                                       name="Training nnet")
+  # train_nnet = nn_layers.FeedForwardNet(layers=[nnet_q, nnet_a, x_hidden_layer, dropout_q, dropout_a, classifier],
+  train_nnet = nn_layers.FeedForwardNet(layers=[nnet_q, nnet_a, dropout_q, dropout_a, classifier],
+                                        name="Training nnet")
 
-  # test_classifier = nn_layers.PairwiseLogisticWithFeatsRegression(q_in=logistic_n_in,
-  #                                                         a_in=logistic_n_in,
-  #                                                         n_in=feats_nout,
-  #                                                         n_out=n_outs,
-  #                                                         W=classifier.W,
-  #                                                         W_feats=classifier.W_feats,
-  #                                                         b=classifier.b)
-  # # test_classifier.set_input((nnet_q.output, nnet_a.output, x_hidden_layer.output))
+  test_classifier = nn_layers.PairwiseLogisticWithFeatsRegression(q_in=q_logistic_n_in,
+                                                          a_in=a_logistic_n_in,
+                                                          n_in=feats_nout,
+                                                          n_out=n_outs,
+                                                          W=classifier.W,
+                                                          W_feats=classifier.W_feats,
+                                                          b=classifier.b)
+  test_classifier.set_input((nnet_q.output, nnet_a.output, x_hidden_layer.output))
   # test_classifier.set_input((nnet_q.output, nnet_a.output, x))
-  # # test_nnet = nn_layers.FeedForwardNet(layers=[nnet_q, nnet_a, x_hidden_layer, test_classifier],
+  test_nnet = nn_layers.FeedForwardNet(layers=[nnet_q, nnet_a, x_hidden_layer, test_classifier],
   # test_nnet = nn_layers.FeedForwardNet(layers=[nnet_q, nnet_a, test_classifier],
-  #                                       name="Test nnet")
+                                        name="Test nnet")
   #########
 
 # 此处应该是进行句子匹配层
   # pairwise_layer = nn_layers.PairwiseMultiOnlySimWithFeatsLayer(q_in=q_logistic_n_in,
 
-  pairwise_layer = nn_layers.PairwiseNoFeatsLayer(q_in=q_logistic_n_in,
+  # pairwise_layer = nn_layers.PairwiseNoFeatsLayer(q_in=q_logistic_n_in,
   # pairwise_layer = nn_layers.PairwiseWithFeatsLayer(q_in=q_logistic_n_in,
   # pairwise_layer = nn_layers.PairwiseOnlySimWithFeatsLayer(q_in=q_logistic_n_in,
-                                                a_in=a_logistic_n_in)
-  pairwise_layer.set_input((nnet_q.output, nnet_a.output))
+  #                                               a_in=a_logistic_n_in)
+  # pairwise_layer.set_input((nnet_q.output, nnet_a.output))
 
 # 此处n_in的取值要根据上一层匹配层的方案进行不同的计算
   # n_in = q_logistic_n_in + a_logistic_n_in + feats_ndim + a_logistic_n_in
   # n_in = q_logistic_n_in + a_logistic_n_in + feats_ndim + 50
   # n_in = q_logistic_n_in + a_logistic_n_in + feats_ndim + 1
-  n_in = q_logistic_n_in + a_logistic_n_in + 1
+  # n_in = q_logistic_n_in + a_logistic_n_in + 1
   # n_in = feats_ndim + 1
   # n_in = feats_ndim + 50
 
-  hidden_layer = nn_layers.LinearLayer(numpy_rng, n_in=n_in, n_out=n_in, activation=activation)
-  hidden_layer.set_input(pairwise_layer.output)
+  # hidden_layer = nn_layers.LinearLayer(numpy_rng, n_in=n_in, n_out=n_in, activation=activation)
+  # hidden_layer.set_input(pairwise_layer.output)
+  #
+  # classifier = nn_layers.LogisticRegression(n_in=n_in, n_out=n_outs)
+  # classifier.set_input(hidden_layer.output)
 
-  classifier = nn_layers.LogisticRegression(n_in=n_in, n_out=n_outs)
-  classifier.set_input(hidden_layer.output)
 
-
-  train_nnet = nn_layers.FeedForwardNet(layers=[nnet_q, nnet_a, pairwise_layer, hidden_layer, classifier],
+  # train_nnet = nn_layers.FeedForwardNet(layers=[nnet_q, nnet_a, pairwise_layer, hidden_layer, classifier],
   # train_nnet = nn_layers.FeedForwardNet(layers=[nnet_q, nnet_a, x_hidden_layer, classifier],
-                                        name="Training nnet")
-  test_nnet = train_nnet
+  #                                       name="Training nnet")
+  # test_nnet = train_nnet
   #######
 
   print train_nnet
@@ -375,7 +379,7 @@ def main():
   #   print w.name, L2_reg
   #   cost += T.sum(w**2) * L2_reg
 
-  # batch_x = T.dmatrix('batch_x')
+  batch_x = T.dmatrix('batch_x')
   batch_x_q = T.lmatrix('batch_x_q')
   batch_x_a = T.lmatrix('batch_x_a')
   batch_x_q_overlap = T.lmatrix('batch_x_q_overlap')
@@ -386,25 +390,26 @@ def main():
   # updates = sgd_trainer.get_adagrad_updates(cost, params, learning_rate=learning_rate, max_norm=max_norm, _eps=1e-6)
   updates = sgd_trainer.get_adadelta_updates(cost, params, rho=0.95, eps=1e-6, max_norm=max_norm, word_vec_name='W_emb')
 
+  # batch_x是否注释，代表是否用overlap_feat特征用于训练
   inputs_pred = [batch_x_q,
                  batch_x_a,
                  batch_x_q_overlap,
                  batch_x_a_overlap,
-                 # batch_x,
+                 batch_x,
                  ]
 
   givens_pred = {x_q: batch_x_q,
                  x_a: batch_x_a,
                  x_q_overlap: batch_x_q_overlap,
                  x_a_overlap: batch_x_a_overlap,
-                 # x: batch_x
+                 x: batch_x
                  }
 
   inputs_train = [batch_x_q,
                  batch_x_a,
                  batch_x_q_overlap,
                  batch_x_a_overlap,
-                 # batch_x,
+                 batch_x,
                  batch_y,
                  ]
 
@@ -412,7 +417,7 @@ def main():
                  x_a: batch_x_a,
                  x_q_overlap: batch_x_q_overlap,
                  x_a_overlap: batch_x_a_overlap,
-                 # x: batch_x,
+                 x: batch_x,
                  y: batch_y}
 
 # 训练函数定义
@@ -431,17 +436,30 @@ def main():
 
   def predict_batch(batch_iterator):
     # numpy.hstack:Stack arrays in sequence horizontally (column wise).This is equivalent to concatenation along the second axis, except for 1-D arrays where it concatenates along the first axis
-    preds = numpy.hstack([pred_fn(batch_x_q, batch_x_a, batch_x_q_overlap, batch_x_a_overlap) for batch_x_q, batch_x_a, batch_x_q_overlap, batch_x_a_overlap, _ in batch_iterator])
+    # preds = numpy.hstack([pred_fn(batch_x_q, batch_x_a, batch_x_q_overlap, batch_x_a_overlap) for batch_x_q, batch_x_a, batch_x_q_overlap, batch_x_a_overlap, _ in batch_iterator])
+    preds = numpy.hstack([pred_prob_fn(batch_x_q, batch_x_a, batch_x_q_overlap, batch_x_a_overlap, batch_x) for
+                          batch_x_q, batch_x_a, batch_x_q_overlap, batch_x_a_overlap, batch_x,_ in batch_iterator])
     return preds[:batch_iterator.n_samples]
 
   def predict_prob_batch(batch_iterator):
-    preds = numpy.hstack([pred_prob_fn(batch_x_q, batch_x_a, batch_x_q_overlap, batch_x_a_overlap) for batch_x_q, batch_x_a, batch_x_q_overlap, batch_x_a_overlap, _ in batch_iterator])
+    # preds = numpy.hstack([pred_prob_fn(batch_x_q, batch_x_a, batch_x_q_overlap, batch_x_a_overlap) for batch_x_q, batch_x_a, batch_x_q_overlap, batch_x_a_overlap, _ in batch_iterator])
+    preds = numpy.hstack([pred_prob_fn(batch_x_q, batch_x_a, batch_x_q_overlap, batch_x_a_overlap,batch_x) for
+                          batch_x_q, batch_x_a, batch_x_q_overlap, batch_x_a_overlap, batch_x,_ in batch_iterator])
     return preds[:batch_iterator.n_samples]
 
 # 三个迭代器
-  train_set_iterator = sgd_trainer.MiniBatchIteratorConstantBatchSize(numpy_rng, [q_train, a_train, q_overlap_train, a_overlap_train, y_train], batch_size=batch_size, randomize=True)
-  dev_set_iterator = sgd_trainer.MiniBatchIteratorConstantBatchSize(numpy_rng, [q_dev, a_dev, q_overlap_dev, a_overlap_dev, y_dev], batch_size=batch_size, randomize=False)
-  test_set_iterator = sgd_trainer.MiniBatchIteratorConstantBatchSize(numpy_rng, [q_test, a_test, q_overlap_test, a_overlap_test, y_test], batch_size=batch_size, randomize=False)
+#   train_set_iterator = sgd_trainer.MiniBatchIteratorConstantBatchSize(numpy_rng, [q_train, a_train, q_overlap_train, a_overlap_train, y_train], batch_size=batch_size, randomize=True)
+#   dev_set_iterator = sgd_trainer.MiniBatchIteratorConstantBatchSize(numpy_rng, [q_dev, a_dev, q_overlap_dev, a_overlap_dev, y_dev], batch_size=batch_size, randomize=False)
+#   test_set_iterator = sgd_trainer.MiniBatchIteratorConstantBatchSize(numpy_rng, [q_test, a_test, q_overlap_test, a_overlap_test, y_test], batch_size=batch_size, randomize=False)
+  train_set_iterator = sgd_trainer.MiniBatchIteratorConstantBatchSize(numpy_rng, [q_train, a_train, q_overlap_train,
+                                                                                  a_overlap_train,x_train,y_train],
+                                                                      batch_size=batch_size, randomize=True)
+  dev_set_iterator = sgd_trainer.MiniBatchIteratorConstantBatchSize(numpy_rng,
+                                                                    [q_dev, a_dev, q_overlap_dev, a_overlap_dev,x_dev,y_dev],
+                                                                    batch_size=batch_size, randomize=False)
+  test_set_iterator = sgd_trainer.MiniBatchIteratorConstantBatchSize(numpy_rng,
+                                                                     [q_test, a_test, q_overlap_test, a_overlap_test,x_test,
+                                                                      y_test], batch_size=batch_size, randomize=False)
 
   labels = sorted(numpy.unique(y_test))
   print 'labels', labels
@@ -481,8 +499,8 @@ def main():
   num_train_batches = len(train_set_iterator)
   while epoch < n_epochs:
       timer = time.time()
-      for i, (x_q, x_a, x_q_overlap, x_a_overlap, y) in enumerate(tqdm(train_set_iterator), 1):
-          train_fn(x_q, x_a, x_q_overlap, x_a_overlap, y)
+      for i, (x_q, x_a, x_q_overlap, x_a_overlap,x, y) in enumerate(tqdm(train_set_iterator), 1):
+          train_fn(x_q, x_a, x_q_overlap, x_a_overlap, x,y)
 
           # Make sure the null word in the word embeddings always remains zero
           if ZEROUT_DUMMY_WORD:
