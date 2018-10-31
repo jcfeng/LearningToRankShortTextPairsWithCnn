@@ -792,6 +792,7 @@ class __PairwiseLogisticWithFeatsRegression(PairwiseLogisticRegression):
 
 
 class PairwiseWithFeatsLayer(Layer):
+    # 此处原n_in参数并未用到，删除
   def __init__(self, q_in, a_in, n_in, activation=T.tanh):
     super(PairwiseWithFeatsLayer, self).__init__()
 

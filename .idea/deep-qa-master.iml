@@ -5,5 +5,8 @@
     <orderEntry type="jdk" jdkName="Python 2.7.13 (C:\Python27\python.exe)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="some_function" />
+    <orderEntry type="module" module-name="some_function" />
+    <orderEntry type="module" module-name="RootCauseTestRelateShell" />
+    <orderEntry type="module" module-name="RootCauseTestShell" />
   </component>
 </module>

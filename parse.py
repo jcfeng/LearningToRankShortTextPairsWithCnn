@@ -12,20 +12,25 @@ from alphabet import Alphabet
 UNKNOWN_WORD_IDX = 0
 
 
-def load_data(fname):
+def load_data(fname,num):
   lines = open(fname).readlines()
   qids, questions, answers, labels = [], [], [], []
   num_skipped = 0
   prev = ''
   qid2num_answers = {}
   for i, line in enumerate(lines):
+    if num<0:
+      break
     line = line.strip()
 
     qid_match = re.match('<QApairs id=\'(.*)\'>', line)
 
     if qid_match:
+
       qid = qid_match.group(1)
       qid2num_answers[qid] = 0
+      num = num - 1
+
 
     if prev and prev.startswith('<question>'):
       question = line.lower().split('\t')
@@ -44,6 +49,7 @@ def load_data(fname):
       qids.append(qid)
       qid2num_answers[qid] += 1
     prev = line
+
   # print sorted(qid2num_answers.items(), key=lambda x: float(x[0]))
   print 'num_skipped', num_skipped
   # return qids[0:50], questions[0:50], answers[0:50], labels[0:50]
@@ -108,7 +114,7 @@ def compute_overlap_idx(questions, answers, stoplist, q_max_sent_length, a_max_s
     a_idx = np.ones(a_max_sent_length) * 2
     # enumerate()函数用于将一个可遍历的数据对象(如列表、元组或字符串)组合为一个索引序列，同时列出数据和数据下标，一般用在for 循环当中。
     for i, a in enumerate(answer):
-      print len(answer)
+      # print len(answer)
       value = 0
       if a in word_overlap:
         value = 1
@@ -180,13 +186,28 @@ if __name__ == '__main__':
       os.makedirs(outdir)
 
     # all_fname = train
-    all_fname = "/tmp/trec-merged.txt"
-    files = ' '.join([train, dev, test])
-    subprocess.call("/bin/cat {} > {}".format(files, all_fname), shell=True)
+    # all_fname = "/tmp/trec-merged.txt"
+    # files = ' '.join([train, dev, test])
+    # subprocess.call("/bin/cat {} > {}".format(files, all_fname), shell=True)
 
     # qids, questions, answers, labels = load_data(all_fname, stoplist)
     # 此处得到的question和answer都为原句split成word的格式
-    qids, questions, answers, labels = load_data(all_fname)
+    # qids, questions, answers, labels = load_data(all_fname)
+    qids_t, questions_t, answers_t, labels_t = load_data(train,3)
+    qids_d, questions_d, answers_d, labels_d = load_data(dev, 2)
+    qids_test, questions_test, answers_test, labels_test = load_data(test, 2)
+    qids = np.concatenate((qids_t,qids_d,qids_test),axis = 0)
+    # print "questions_t:",questions_t.shape
+    # print "questions_d:", questions_d.shape
+    # print "questions_test:", questions_test.shape
+    # questions = [questions_t, questions_d, questions_test]
+    questions = questions_t+ questions_d+questions_test
+    # questions = np.concatenate((questions_t,questions_d,questions_test),axis = 0)
+    # print "answers_t",answers_t.shape
+    # print "answers_d",answers_d.shape
+    # print "answers_test",answers_test.shape
+    answers = answers_t+answers_d+answers_test
+    labels = np.concatenate((labels_t,labels_d,labels_test),axis = 0)
 
     ### Compute document frequencies.
     seen = set()
@@ -197,6 +218,7 @@ if __name__ == '__main__':
         unique_questions.append(q)
 
     docs = answers + unique_questions
+    # 计算doc frequency
     word2dfs = compute_dfs(docs)
     print word2dfs.items()[:10]
     #########
@@ -222,10 +244,11 @@ if __name__ == '__main__':
     print 'a_max_sent_length', a_max_sent_length
 
     # Convert dev and test sets
-    for fname in [train, dev, test]:
-      print "fname:"+fname
+    for fname,n in zip([train, dev, test],[3,2,2]):
+      print "fname:"+fname+"　ｎ:"+str(n)
       # qids, questions, answers, labels = load_data(fname, stoplist)
-      qids, questions, answers, labels = load_data(fname)
+      qids, questions, answers, labels = load_data(fname,n)
+
       # 得到的是一个由overlap值组成的向量
       overlap_feats = compute_overlap_features(questions, answers, stoplist=None, word2df=word2dfs)
       overlap_feats_stoplist = compute_overlap_features(questions, answers, stoplist=stoplist, word2df=word2dfs)
