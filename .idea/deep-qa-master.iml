@@ -8,5 +8,6 @@
     <orderEntry type="module" module-name="some_function" />
     <orderEntry type="module" module-name="RootCauseTestRelateShell" />
     <orderEntry type="module" module-name="RootCauseTestShell" />
+    <orderEntry type="module" module-name="TopicDiscover" />
   </component>
 </module>

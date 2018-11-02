@@ -97,9 +97,9 @@ def main():
 
   # print 'a_overlap_train',a_overlap_train.shape
 
-  print 'x_train',x_train.shape
-  print 'x_dev',x_dev.shape
-  print 'x_test',x_test.shape
+  # print 'x_train',x_train.shape
+  # print 'x_dev',x_dev.shape
+  # print 'x_test',x_test.shape
 
   ## Get the word embeddings from the nnet trained on SemEval
   # ndim = 40
@@ -144,7 +144,7 @@ def main():
   dummpy_word_idx = numpy.max(a_train)
   print "Word embedding matrix size:", vocab_emb.shape
 
-  x = T.dmatrix('x')
+  # x = T.dmatrix('x')
   x_q = T.lmatrix('q')
   x_q_overlap = T.lmatrix('q_overlap')
   x_a = T.lmatrix('a')
@@ -166,7 +166,7 @@ def main():
 
   ## 1st conv layer.
   ndim = vocab_emb.shape[1] + vocab_emb_overlap.shape[1]
-  ndim = vocab_emb.shape[1]
+  # ndim = vocab_emb.shape[1]
   print "1st conv layer dim:",ndim
 
   ### Nonlinearity type
@@ -187,7 +187,8 @@ def main():
   # 首先获得词向量信息
   # QQQQ为什么要有这两层？似乎已经获得了词的词向量表示：可能是用于为是每个具体的句子获得词向量表示
   # QQQQQ pad具体实现
-  lookup_table_words = nn_layers.LookupTableFastStatic(W=vocab_emb, pad=max(q_filter_widths)-1)
+  # lookup_table_words = nn_layers.LookupTableFastStatic(W=vocab_emb, pad=max(q_filter_widths)-1)
+  lookup_table_words = nn_layers.LookupTableFast(W=vocab_emb, pad=max(q_filter_widths) - 1)
   #QQQQQ这一层的用途？可能也是来获得具体的句子对的overlap向量
   lookup_table_overlap = nn_layers.LookupTableFast(W=vocab_emb_overlap, pad=max(q_filter_widths)-1)
   # lookup_table = nn_layers.ParallelLookupTable(layers=[lookup_table_words])
@@ -229,7 +230,8 @@ def main():
 
 
   ###### ANSWER ######
-  lookup_table_words = nn_layers.LookupTableFastStatic(W=vocab_emb, pad=max(q_filter_widths)-1)
+  # lookup_table_words = nn_layers.LookupTableFastStatic(W=vocab_emb, pad=max(q_filter_widths)-1)
+  lookup_table_words = nn_layers.LookupTableFast(W=vocab_emb, pad=max(q_filter_widths) - 1)
   lookup_table_overlap = nn_layers.LookupTableFast(W=vocab_emb_overlap, pad=max(q_filter_widths)-1)
 
   lookup_table = nn_layers.ParallelLookupTable(layers=[lookup_table_words, lookup_table_overlap])
@@ -304,17 +306,17 @@ def main():
 # 此处应该是进行句子匹配层
 #   pairwise_layer = nn_layers.PairwiseMultiOnlySimWithFeatsLayer(q_in=q_logistic_n_in,
 
-  # pairwise_layer = nn_layers.PairwiseNoFeatsLayer(q_in=q_logistic_n_in,
-  pairwise_layer = nn_layers.PairwiseWithFeatsLayer(q_in=q_logistic_n_in,
+  pairwise_layer = nn_layers.PairwiseNoFeatsLayer(q_in=q_logistic_n_in,
+  # pairwise_layer = nn_layers.PairwiseWithFeatsLayer(q_in=q_logistic_n_in,
   # pairwise_layer = nn_layers.PairwiseOnlySimWithFeatsLayer(q_in=q_logistic_n_in,
                                                 a_in=a_logistic_n_in)
-  pairwise_layer.set_input((nnet_q.output, nnet_a.output,x))
+  pairwise_layer.set_input((nnet_q.output, nnet_a.output))
 
 # 此处n_in的取值要根据上一层匹配层的方案进行不同的计算
 #   n_in = q_logistic_n_in + a_logistic_n_in + feats_ndim + a_logistic_n_in
 #   n_in = q_logistic_n_in + a_logistic_n_in + feats_ndim + 50
-  n_in = q_logistic_n_in + a_logistic_n_in + feats_ndim + 1
-  # n_in = q_logistic_n_in + a_logistic_n_in + 1
+#   n_in = q_logistic_n_in + a_logistic_n_in + feats_ndim + 1
+  n_in = q_logistic_n_in + a_logistic_n_in + 1
   # n_in = feats_ndim + 1
   # n_in = feats_ndim + 50
 
@@ -326,8 +328,8 @@ def main():
 
   # dropout2
   # train_nnet = nn_layers.FeedForwardNet(layers=[nnet_q, nnet_a, pairwise_layer, hidden_layer,dropout_q,dropout_a, classifier],
-  # train_nnet = nn_layers.FeedForwardNet(layers=[nnet_q, nnet_a, pairwise_layer, hidden_layer, classifier],
-  train_nnet = nn_layers.FeedForwardNet(layers=[nnet_q, nnet_a, x_hidden_layer, classifier],
+  train_nnet = nn_layers.FeedForwardNet(layers=[nnet_q, nnet_a, pairwise_layer, hidden_layer, classifier],
+  # train_nnet = nn_layers.FeedForwardNet(layers=[nnet_q, nnet_a, x_hidden_layer, classifier],
                                         name="Training nnet")
   test_nnet = train_nnet
   #######
@@ -521,7 +523,7 @@ def main():
   num_train_batches = len(train_set_iterator)
   while epoch < n_epochs:
       timer = time.time()
-      for i, (x_q, x_a, x_q_overlap, x_a_overlap,x, y) in enumerate(tqdm(train_set_iterator), 1):
+      for i, (x_q, x_a, x_q_overlap, x_a_overlap, y) in enumerate(tqdm(train_set_iterator), 1):
       # for i, (x_q, x_a,  x, y) in enumerate(tqdm(train_set_iterator), 1):
           # train_fn(x_q, x_a, x_q_overlap, x_a_overlap, x,y)
           # train_fn(x_q, x_a,  x, y)
